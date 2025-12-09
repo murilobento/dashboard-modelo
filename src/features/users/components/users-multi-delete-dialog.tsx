@@ -2,13 +2,15 @@
 
 import { useState } from 'react'
 import { type Table } from '@tanstack/react-table'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { sleep } from '@/lib/utils'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import { deleteUsers } from '../api/users-api'
+import { type User } from '../data/schema'
+import { useUsers } from './users-provider'
 
 type UserMultiDeleteDialogProps<TData> = {
   open: boolean
@@ -24,27 +26,31 @@ export function UsersMultiDeleteDialog<TData>({
   table,
 }: UserMultiDeleteDialogProps<TData>) {
   const [value, setValue] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const { onSuccess } = useUsers()
 
   const selectedRows = table.getFilteredSelectedRowModel().rows
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (value.trim() !== CONFIRM_WORD) {
       toast.error(`Please type "${CONFIRM_WORD}" to confirm.`)
       return
     }
 
-    onOpenChange(false)
-
-    toast.promise(sleep(2000), {
-      loading: 'Deleting users...',
-      success: () => {
-        table.resetRowSelection()
-        return `Deleted ${selectedRows.length} ${
-          selectedRows.length > 1 ? 'users' : 'user'
-        }`
-      },
-      error: 'Error',
-    })
+    setIsLoading(true)
+    try {
+      const ids = selectedRows.map((row) => (row.original as User).id)
+      await deleteUsers(ids)
+      toast.success(`Deleted ${selectedRows.length} ${selectedRows.length > 1 ? 'users' : 'user'}`)
+      table.resetRowSelection()
+      setValue('')
+      onOpenChange(false)
+      onSuccess()
+    } catch {
+      toast.error('Failed to delete users')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -52,15 +58,15 @@ export function UsersMultiDeleteDialog<TData>({
       open={open}
       onOpenChange={onOpenChange}
       handleConfirm={handleDelete}
-      disabled={value.trim() !== CONFIRM_WORD}
+      disabled={value.trim() !== CONFIRM_WORD || isLoading}
       title={
         <span className='text-destructive'>
-          <AlertTriangle
-            className='stroke-destructive me-1 inline-block'
-            size={18}
-          />{' '}
-          Delete {selectedRows.length}{' '}
-          {selectedRows.length > 1 ? 'users' : 'user'}
+          {isLoading ? (
+            <Loader2 className='me-1 inline-block animate-spin' size={18} />
+          ) : (
+            <AlertTriangle className='stroke-destructive me-1 inline-block' size={18} />
+          )}
+          Delete {selectedRows.length} {selectedRows.length > 1 ? 'users' : 'user'}
         </span>
       }
       desc={
@@ -71,7 +77,7 @@ export function UsersMultiDeleteDialog<TData>({
           </p>
 
           <Label className='my-4 flex flex-col items-start gap-1.5'>
-            <span className=''>Confirm by typing "{CONFIRM_WORD}":</span>
+            <span>Confirm by typing "{CONFIRM_WORD}":</span>
             <Input
               value={value}
               onChange={(e) => setValue(e.target.value)}
