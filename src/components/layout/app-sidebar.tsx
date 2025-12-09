@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useLayout } from '@/context/layout-provider'
 import {
   Sidebar,
@@ -6,25 +7,23 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar'
-// import { AppTitle } from './app-title'
+import { AppTitle } from './app-title'
 import { sidebarData } from './data/sidebar-data'
 import { NavGroup } from './nav-group'
 import { NavUser } from './nav-user'
-import { TeamSwitcher } from './team-switcher'
+import { ModuleSwitcher } from './module-switcher'
 
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
+  const [activeModule, setActiveModule] = useState(sidebarData.modules[0])
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
-      <SidebarHeader>
-        <TeamSwitcher teams={sidebarData.teams} />
-
-        {/* Replace <TeamSwitch /> with the following <AppTitle />
-         /* if you want to use the normal app title instead of TeamSwitch dropdown */}
-        {/* <AppTitle /> */}
+      <SidebarHeader className='gap-4'>
+        <AppTitle />
+        <ModuleSwitcher modules={sidebarData.modules} activeModule={activeModule} setActiveModule={setActiveModule} />
       </SidebarHeader>
       <SidebarContent>
-        {sidebarData.navGroups.map((props) => (
+        {sidebarData.navGroups.filter(props => props.moduleId === activeModule.id).map((props) => (
           <NavGroup key={props.title} {...props} />
         ))}
       </SidebarContent>

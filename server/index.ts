@@ -67,6 +67,121 @@ app.post('/api/users', async (c) => {
     body: { name, email, password },
   })
   return c.json(ctx.user)
+  return c.json(ctx.user)
+})
+
+// Company Settings API
+
+// Initialize Company Settings Table
+const initCompanySettings = async () => {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS company_settings (
+      id SERIAL PRIMARY KEY,
+      nome_fantasia TEXT,
+      razao_social TEXT,
+      cnpj TEXT,
+      inscricao_estadual TEXT,
+      cep TEXT,
+      logradouro TEXT,
+      numero TEXT,
+      complemento TEXT,
+      bairro TEXT,
+      cidade TEXT,
+      uf TEXT,
+      email TEXT,
+      site TEXT,
+      telefone TEXT,
+      instagram TEXT,
+      facebook TEXT,
+      tiktok TEXT,
+      whatsapp TEXT,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    );
+  `)
+  try {
+    await pool.query('ALTER TABLE company_settings ADD COLUMN IF NOT EXISTS nome_fantasia TEXT')
+    await pool.query('ALTER TABLE company_settings ADD COLUMN IF NOT EXISTS razao_social TEXT')
+  } catch (e) {
+    console.error('Migration error:', e)
+  }
+}
+initCompanySettings().catch(console.error)
+
+app.get('/api/company-settings', async (c) => {
+  const result = await pool.query('SELECT * FROM company_settings WHERE id = 1')
+  return c.json(result.rows[0] || {})
+})
+
+app.post('/api/company-settings', async (c) => {
+  const body = await c.req.json()
+  const {
+    nome_fantasia,
+    razao_social,
+    cnpj,
+    inscricao_estadual,
+    cep,
+    logradouro,
+    numero,
+    complemento,
+    bairro,
+    cidade,
+    uf,
+    email,
+    site,
+    telefone,
+    instagram,
+    facebook,
+    tiktok,
+    whatsapp,
+  } = body
+
+  const result = await pool.query(
+    `INSERT INTO company_settings (id, nome_fantasia, razao_social, cnpj, inscricao_estadual, cep, logradouro, numero, complemento, bairro, cidade, uf, email, site, telefone, instagram, facebook, tiktok, whatsapp, updated_at)
+     VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, NOW())
+     ON CONFLICT (id) DO UPDATE SET
+       nome_fantasia = EXCLUDED.nome_fantasia,
+       razao_social = EXCLUDED.razao_social,
+       cnpj = EXCLUDED.cnpj,
+       inscricao_estadual = EXCLUDED.inscricao_estadual,
+       cep = EXCLUDED.cep,
+       logradouro = EXCLUDED.logradouro,
+       numero = EXCLUDED.numero,
+       complemento = EXCLUDED.complemento,
+       bairro = EXCLUDED.bairro,
+       cidade = EXCLUDED.cidade,
+       uf = EXCLUDED.uf,
+       email = EXCLUDED.email,
+       site = EXCLUDED.site,
+       telefone = EXCLUDED.telefone,
+       instagram = EXCLUDED.instagram,
+       facebook = EXCLUDED.facebook,
+       tiktok = EXCLUDED.tiktok,
+       whatsapp = EXCLUDED.whatsapp,
+       updated_at = NOW()
+     RETURNING *`,
+    [
+      nome_fantasia,
+      razao_social,
+      cnpj,
+      inscricao_estadual,
+      cep,
+      logradouro,
+      numero,
+      complemento,
+      bairro,
+      cidade,
+      uf,
+      email,
+      site,
+      telefone,
+      instagram,
+      facebook,
+      tiktok,
+      whatsapp,
+    ]
+  )
+  return c.json(result.rows[0])
 })
 
 app.get('/api/health', (c) => c.json({ status: 'ok' }))

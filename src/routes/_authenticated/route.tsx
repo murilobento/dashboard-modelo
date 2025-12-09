@@ -1,8 +1,12 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { getSession } from '@/lib/auth-client'
 import { AuthenticatedLayout } from '@/components/layout/authenticated-layout'
+import { z } from 'zod'
 
 export const Route = createFileRoute('/_authenticated')({
+  validateSearch: z.object({
+    modal: z.string().optional(),
+  }),
   beforeLoad: async ({ location }) => {
     const { data: session } = await getSession()
 

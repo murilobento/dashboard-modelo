@@ -210,6 +210,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.13.8
         version: 1.19.7(hono@4.10.8)
+      bcryptjs:
+        specifier: ^3.0.3
+        version: 3.0.3
       better-auth:
         specifier: ^1.4.6
         version: 1.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(solid-js@1.9.7)
@@ -1930,6 +1933,10 @@ packages:
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
+
+  bcryptjs@3.0.3:
+    resolution: {integrity: sha512-GlF5wPWnSa/X5LKM1o0wz0suXIINz1iHRLvTS+sLyi7XPbe5ycmYI3DlZqVGZZtDgl4DmasFg7gOB3JYbphV5g==}
+    hasBin: true
 
   better-auth@1.4.6:
     resolution: {integrity: sha512-5wEBzjolrQA26b4uT6FVVYICsE3SmE/MzrZtl8cb2a3TJtswpP8v3OVV5yTso+ef9z85swgZk0/qBzcULFWVtA==}
@@ -4969,6 +4976,8 @@ snapshots:
       - supports-color
 
   balanced-match@1.0.2: {}
+
+  bcryptjs@3.0.3: {}
 
   better-auth@1.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(solid-js@1.9.7):
     dependencies:
