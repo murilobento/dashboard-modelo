@@ -62,29 +62,28 @@ export const usersColumns: ColumnDef<User>[] = [
     ),
   },
   {
-    accessorKey: 'emailVerified',
+    accessorKey: 'status',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Status' />
     ),
     cell: ({ row }) => {
-      const verified = row.getValue('emailVerified')
+      const status = row.getValue('status') as string
       return (
         <Badge
           variant='outline'
           className={cn(
             'capitalize',
-            verified
+            status === 'active'
               ? 'bg-teal-100/30 text-teal-900 dark:text-teal-200 border-teal-200'
-              : 'bg-neutral-300/40 border-neutral-300'
+              : 'bg-neutral-300/40 border-neutral-300 text-neutral-600'
           )}
         >
-          {verified ? 'Verified' : 'Unverified'}
+          {status}
         </Badge>
       )
     },
     filterFn: (row, id, value) => {
-      const verified = row.getValue(id)
-      return value.includes(verified ? 'verified' : 'unverified')
+      return value.includes(row.getValue(id))
     },
     enableSorting: false,
   },

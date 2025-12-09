@@ -8,7 +8,7 @@ export async function fetchUsers(): Promise<User[]> {
   return res.json()
 }
 
-export async function createUser(data: { name: string; email: string; password: string }): Promise<User> {
+export async function createUser(data: { name: string; email: string; password: string; status: string }): Promise<User> {
   const res = await fetch(`${API_URL}/api/users`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -19,7 +19,7 @@ export async function createUser(data: { name: string; email: string; password: 
   return res.json()
 }
 
-export async function updateUser(id: string, data: { name: string; email: string; password?: string }): Promise<User> {
+export async function updateUser(id: string, data: { name: string; email: string; password?: string; status?: string }): Promise<User> {
   const res = await fetch(`${API_URL}/api/users/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },

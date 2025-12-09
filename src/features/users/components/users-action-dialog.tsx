@@ -23,6 +23,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { Switch } from '@/components/ui/switch'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 import { createUser, updateUser } from '../api/users-api'
@@ -33,6 +34,7 @@ const formSchema = z
   .object({
     name: z.string().min(1, 'Name is required.'),
     email: z.email({ message: 'Email is required.' }),
+    status: z.string().min(1, 'Status is required'),
     password: z.string().transform((pwd) => pwd.trim()),
     confirmPassword: z.string().transform((pwd) => pwd.trim()),
     isEdit: z.boolean(),
@@ -66,12 +68,14 @@ type UserActionDialogProps = {
   currentRow?: User
   open: boolean
   onOpenChange: (open: boolean) => void
+  readOnly?: boolean
 }
 
 export function UsersActionDialog({
   currentRow,
   open,
   onOpenChange,
+  readOnly,
 }: UserActionDialogProps) {
   const isEdit = !!currentRow
   const [isLoading, setIsLoading] = useState(false)
@@ -80,8 +84,8 @@ export function UsersActionDialog({
   const form = useForm<UserForm>({
     resolver: zodResolver(formSchema),
     defaultValues: isEdit
-      ? { name: currentRow.name, email: currentRow.email, password: '', confirmPassword: '', isEdit }
-      : { name: '', email: '', password: '', confirmPassword: '', isEdit },
+      ? { name: currentRow.name, email: currentRow.email, status: currentRow.status || 'active', password: '', confirmPassword: '', isEdit }
+      : { name: '', email: '', status: 'active', password: '', confirmPassword: '', isEdit },
   })
 
   const onSubmit = async (values: UserForm) => {
@@ -91,11 +95,12 @@ export function UsersActionDialog({
         await updateUser(currentRow.id, {
           name: values.name,
           email: values.email,
+          status: values.status,
           ...(values.password ? { password: values.password } : {}),
         })
         toast.success('User updated successfully')
       } else {
-        await createUser({ name: values.name, email: values.email, password: values.password })
+        await createUser({ name: values.name, email: values.email, status: values.status, password: values.password })
         toast.success('User created successfully')
       }
       form.reset()
@@ -120,10 +125,12 @@ export function UsersActionDialog({
     >
       <DialogContent className='sm:max-w-lg'>
         <DialogHeader className='text-start'>
-          <DialogTitle>{isEdit ? 'Edit User' : 'Add New User'}</DialogTitle>
+          <DialogTitle>{isEdit ? (readOnly ? 'View User' : 'Edit User') : 'Add New User'}</DialogTitle>
           <DialogDescription>
-            {isEdit ? 'Update the user here. ' : 'Create new user here. '}
-            Click save when you&apos;re done.
+            {isEdit
+              ? (readOnly ? 'View user details.' : 'Update the user here.')
+              : 'Create new user here.'}
+            {!readOnly && " Click save when you're done."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -139,7 +146,7 @@ export function UsersActionDialog({
                 <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                   <FormLabel className='col-span-2 text-end'>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder='John Doe' className='col-span-4' autoComplete='off' {...field} />
+                    <Input placeholder='John Doe' className='col-span-4' autoComplete='off' {...field} disabled={readOnly || isLoading} />
                   </FormControl>
                   <FormMessage className='col-span-4 col-start-3' />
                 </FormItem>
@@ -152,7 +159,24 @@ export function UsersActionDialog({
                 <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                   <FormLabel className='col-span-2 text-end'>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder='john@example.com' className='col-span-4' {...field} />
+                    <Input placeholder='john@example.com' className='col-span-4' {...field} disabled={readOnly || isLoading} />
+                  </FormControl>
+                  <FormMessage className='col-span-4 col-start-3' />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='status'
+              render={({ field }) => (
+                <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                  <FormLabel className='col-span-2 text-end'>Status</FormLabel>
+                  <FormControl>
+                    <Switch
+                      checked={field.value === 'active'}
+                      onCheckedChange={(checked) => field.onChange(checked ? 'active' : 'inactive')}
+                      disabled={readOnly || isLoading}
+                    />
                   </FormControl>
                   <FormMessage className='col-span-4 col-start-3' />
                 </FormItem>
@@ -171,6 +195,7 @@ export function UsersActionDialog({
                       placeholder={isEdit ? 'Leave blank to keep current' : '********'}
                       className='col-span-4'
                       {...field}
+                      disabled={readOnly || isLoading}
                     />
                   </FormControl>
                   <FormMessage className='col-span-4 col-start-3' />
@@ -185,10 +210,10 @@ export function UsersActionDialog({
                   <FormLabel className='col-span-2 text-end'>Confirm Password</FormLabel>
                   <FormControl>
                     <PasswordInput
-                      disabled={!isPasswordTouched}
                       placeholder={isEdit ? 'Leave blank to keep current' : '********'}
                       className='col-span-4'
                       {...field}
+                      disabled={readOnly || isLoading || !isPasswordTouched}
                     />
                   </FormControl>
                   <FormMessage className='col-span-4 col-start-3' />
@@ -198,10 +223,19 @@ export function UsersActionDialog({
           </form>
         </Form>
         <DialogFooter>
-          <Button type='submit' form='user-form' disabled={isLoading}>
-            {isLoading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-            Save changes
-          </Button>
+          {!readOnly ? (
+            <Button type='submit' form='user-form' disabled={isLoading}>
+              {isLoading && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+              Save changes
+            </Button>
+          ) : (
+            <Button type='button' onClick={(e) => {
+              e.preventDefault()
+              onOpenChange(false)
+            }}>
+              Close
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

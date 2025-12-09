@@ -12,10 +12,19 @@ import { sidebarData } from './data/sidebar-data'
 import { NavGroup } from './nav-group'
 import { NavUser } from './nav-user'
 import { ModuleSwitcher } from './module-switcher'
+import { useSession } from '@/lib/auth-client'
 
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
   const [activeModule, setActiveModule] = useState(sidebarData.modules[0])
+  const { data: session } = useSession()
+
+  const user = session?.user ? {
+    name: session.user.name,
+    email: session.user.email,
+    avatar: session.user.image || sidebarData.user.avatar,
+  } : sidebarData.user
+
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
       <SidebarHeader className='gap-4'>
@@ -28,7 +37,7 @@ export function AppSidebar() {
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={sidebarData.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

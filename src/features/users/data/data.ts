@@ -1,4 +1,4 @@
 export const userStatuses = [
-  { label: 'Verified', value: 'verified' },
-  { label: 'Unverified', value: 'unverified' },
+  { label: 'Active', value: 'active' },
+  { label: 'Inactive', value: 'inactive' },
 ] as const

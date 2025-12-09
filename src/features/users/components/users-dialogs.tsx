@@ -9,31 +9,38 @@ export function UsersDialogs() {
       <UsersActionDialog
         key='user-add'
         open={open === 'add'}
-        onOpenChange={() => setOpen('add')}
+        onOpenChange={(isOpen) => setOpen(isOpen ? 'add' : null)}
       />
 
       {currentRow && (
         <>
           <UsersActionDialog
             key={`user-edit-${currentRow.id}`}
-            open={open === 'edit'}
-            onOpenChange={() => {
-              setOpen('edit')
-              setTimeout(() => {
-                setCurrentRow(null)
-              }, 500)
+            open={open === 'edit' || open === 'view'}
+            onOpenChange={(isOpen) => {
+              if (isOpen) setOpen(open)
+              else {
+                setOpen(null)
+                setTimeout(() => {
+                  setCurrentRow(null)
+                }, 500)
+              }
             }}
             currentRow={currentRow}
+            readOnly={open === 'view'}
           />
 
           <UsersDeleteDialog
             key={`user-delete-${currentRow.id}`}
             open={open === 'delete'}
-            onOpenChange={() => {
-              setOpen('delete')
-              setTimeout(() => {
-                setCurrentRow(null)
-              }, 500)
+            onOpenChange={(isOpen) => {
+              if (isOpen) setOpen('delete')
+              else {
+                setOpen(null)
+                setTimeout(() => {
+                  setCurrentRow(null)
+                }, 500)
+              }
             }}
             currentRow={currentRow}
           />

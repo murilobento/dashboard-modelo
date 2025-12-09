@@ -145,6 +145,12 @@ export function CompanySettingsDialog({ open, onOpenChange }: CompanySettingsDia
             }
         }
     }
+    const maskCEP = (value: string) => {
+        return value
+            .replace(/\D/g, '')
+            .replace(/(\d{5})(\d)/, '$1-$2')
+            .substring(0, 9)
+    }
 
     const maskCNPJ = (value: string) => {
         return value
@@ -213,270 +219,316 @@ export function CompanySettingsDialog({ open, onOpenChange }: CompanySettingsDia
                 </DialogHeader>
                 <Form {...form}>
                     <form id='company-settings-form' onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-                        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-                            {/* Address Fields */}
-                            <FormField
-                                control={form.control}
-                                name='cep'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>CEP</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} onBlur={handleCepBlur} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='logradouro'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Address</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='numero'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Number</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='complemento'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Complement</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='bairro'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Neighborhood</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='cidade'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>City</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='uf'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>State (UF)</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} maxLength={2} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <div className="md:col-span-1"></div> {/* Filler for layout */}
+                        <div className='grid grid-cols-1 gap-4 md:grid-cols-12'>
+                            {/* Row 1: CEP [2] Address [8] Number [2] */}
+                            <div className="col-span-1 md:col-span-2">
+                                <FormField
+                                    control={form.control}
+                                    name='cep'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>CEP</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} onChange={(e) => {
+                                                    field.onChange(maskCEP(e.target.value))
+                                                    if (e.target.value.length === 9) {
+                                                        handleCepBlur({ target: { value: e.target.value } } as any)
+                                                    }
+                                                }} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="col-span-1 md:col-span-8">
+                                <FormField
+                                    control={form.control}
+                                    name='logradouro'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Address</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="col-span-1 md:col-span-2">
+                                <FormField
+                                    control={form.control}
+                                    name='numero'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Number</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
 
-                            {/* Company Info Fields */}
-                            <FormField
-                                control={form.control}
-                                name='nome_fantasia'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Fantasy Name</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='razao_social'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Legal Name</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='cnpj'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>CNPJ</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} onChange={(e) => field.onChange(maskCNPJ(e.target.value))} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='inscricao_estadual'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Inscrição Estadual</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} onChange={(e) => field.onChange(maskIE(e.target.value, uf))} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                            {/* Row 2: Complemento [3] Bairro [4] Cidade [3] UF [2] */}
+                            <div className="col-span-1 md:col-span-3">
+                                <FormField
+                                    control={form.control}
+                                    name='complemento'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Complement</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="col-span-1 md:col-span-4">
+                                <FormField
+                                    control={form.control}
+                                    name='bairro'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Neighborhood</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="col-span-1 md:col-span-3">
+                                <FormField
+                                    control={form.control}
+                                    name='cidade'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>City</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="col-span-1 md:col-span-2">
+                                <FormField
+                                    control={form.control}
+                                    name='uf'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>State (UF)</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} maxLength={2} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
 
-                            {/* Contact Fields */}
-                            <FormField
-                                control={form.control}
-                                name='email'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Email</FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                <Input className="pl-9" {...field} type='email' />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='site'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Website</FormLabel>
-                                        <FormControl>
-                                            <div className="flex h-9 w-full rounded-md border border-input bg-transparent shadow-sm focus-within:ring-1 focus-within:ring-ring">
-                                                <div className="flex items-center px-3 bg-muted border-r text-sm text-muted-foreground rounded-l-md">
-                                                    https://
+                            {/* Row 3: Nome fantasia [6] Razão Social [6] */}
+                            <div className="col-span-1 md:col-span-6">
+                                <FormField
+                                    control={form.control}
+                                    name='nome_fantasia'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Fantasy Name</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="col-span-1 md:col-span-6">
+                                <FormField
+                                    control={form.control}
+                                    name='razao_social'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Legal Name</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            {/* Row 4: CNPJ [6] IE [6] */}
+                            <div className="col-span-1 md:col-span-6">
+                                <FormField
+                                    control={form.control}
+                                    name='cnpj'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>CNPJ</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} onChange={(e) => field.onChange(maskCNPJ(e.target.value))} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="col-span-1 md:col-span-6">
+                                <FormField
+                                    control={form.control}
+                                    name='inscricao_estadual'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Inscrição Estadual</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} onChange={(e) => field.onChange(maskIE(e.target.value, uf))} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            {/* Row 5: Email [4] Website [4] Phone [4] */}
+                            <div className="col-span-1 md:col-span-4">
+                                <FormField
+                                    control={form.control}
+                                    name='email'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Email</FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <Mail className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                    <Input className="pl-9" {...field} type='email' />
                                                 </div>
-                                                <Input className="h-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-l-none shadow-none" {...field} />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='telefone'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Phone</FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <Phone className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                <Input className="pl-9" {...field} onChange={(e) => field.onChange(maskPhone(e.target.value))} />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='tiktok'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>TikTok</FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <TikTokIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                <Input className="pl-9" {...field} />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='whatsapp'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>WhatsApp</FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <WhatsAppIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                <Input className="pl-9" {...field} onChange={(e) => field.onChange(maskPhone(e.target.value))} />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='instagram'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Instagram</FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <Instagram className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                <Input className="pl-9" {...field} />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name='facebook'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Facebook</FormLabel>
-                                        <FormControl>
-                                            <div className="relative">
-                                                <Facebook className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                                <Input className="pl-9" {...field} />
-                                            </div>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="col-span-1 md:col-span-4">
+                                <FormField
+                                    control={form.control}
+                                    name='site'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Website</FormLabel>
+                                            <FormControl>
+                                                <div className="flex h-9 w-full rounded-md border border-input bg-transparent shadow-sm focus-within:ring-1 focus-within:ring-ring">
+                                                    <div className="flex items-center px-3 bg-muted border-r text-sm text-muted-foreground rounded-l-md">
+                                                        https://
+                                                    </div>
+                                                    <Input className="h-full border-0 focus-visible:ring-0 focus-visible:ring-offset-0 rounded-l-none shadow-none" {...field} />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="col-span-1 md:col-span-4">
+                                <FormField
+                                    control={form.control}
+                                    name='telefone'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Phone</FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <Phone className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                    <Input className="pl-9" {...field} onChange={(e) => field.onChange(maskPhone(e.target.value))} />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
+                            {/* Row 6: Tiktok [3] Whatsapp [3] Instagram [3] Facebook [3] */}
+                            <div className="col-span-1 md:col-span-3">
+                                <FormField
+                                    control={form.control}
+                                    name='tiktok'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>TikTok</FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <TikTokIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                    <Input className="pl-9" {...field} />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="col-span-1 md:col-span-3">
+                                <FormField
+                                    control={form.control}
+                                    name='whatsapp'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>WhatsApp</FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <WhatsAppIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                    <Input className="pl-9" {...field} onChange={(e) => field.onChange(maskPhone(e.target.value))} />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="col-span-1 md:col-span-3">
+                                <FormField
+                                    control={form.control}
+                                    name='instagram'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Instagram</FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <Instagram className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                    <Input className="pl-9" {...field} />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="col-span-1 md:col-span-3">
+                                <FormField
+                                    control={form.control}
+                                    name='facebook'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Facebook</FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                    <Facebook className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                                                    <Input className="pl-9" {...field} />
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                         </div>
                     </form>
                 </Form>

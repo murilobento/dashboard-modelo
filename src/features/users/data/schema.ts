@@ -5,6 +5,7 @@ const userSchema = z.object({
   name: z.string(),
   email: z.string(),
   image: z.string().nullable(),
+  status: z.string().default('active'),
   emailVerified: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),

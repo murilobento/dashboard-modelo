@@ -19,12 +19,40 @@ app.use(
   })
 )
 
+app.use('/api/auth/sign-in/email', async (c, next) => {
+  if (c.req.method === 'POST') {
+    try {
+      const clone = c.req.raw.clone()
+      const body = await clone.json()
+      const { email } = body
+      if (email) {
+        const result = await pool.query('SELECT status FROM "user" WHERE email = $1', [email])
+        if (result.rows.length > 0 && result.rows[0].status === 'inactive') {
+          return c.json({ message: "Your account is inactive. Please contact the administrator." }, 403)
+        }
+      }
+    } catch (e) {
+      console.error('Login interception error:', e)
+    }
+  }
+  await next()
+})
+
 app.on(['POST', 'GET'], '/api/auth/*', (c) => auth.handler(c.req.raw))
 
 // Users API
+const initUserSchema = async () => {
+  try {
+    await pool.query('ALTER TABLE "user" ADD COLUMN IF NOT EXISTS status TEXT DEFAULT \'active\'')
+  } catch (e) {
+    console.error('User migration error:', e)
+  }
+}
+initUserSchema().catch(console.error)
+
 app.get('/api/users', async (c) => {
   const result = await pool.query(
-    'SELECT id, name, email, image, "emailVerified", "createdAt", "updatedAt" FROM "user" ORDER BY "createdAt" DESC'
+    'SELECT id, name, email, image, status, "emailVerified", "createdAt", "updatedAt" FROM "user" ORDER BY "createdAt" DESC'
   )
   return c.json(result.rows)
 })
@@ -39,12 +67,12 @@ app.delete('/api/users/:id', async (c) => {
 app.patch('/api/users/:id', async (c) => {
   const id = c.req.param('id')
   const body = await c.req.json()
-  const { name, email, password } = body
+  const { name, email, password, status } = body
 
   // Update user basic info
   const result = await pool.query(
-    'UPDATE "user" SET name = $1, email = $2, "updatedAt" = NOW() WHERE id = $3 RETURNING *',
-    [name, email, id]
+    'UPDATE "user" SET name = $1, email = $2, status = $3, "updatedAt" = NOW() WHERE id = $4 RETURNING *',
+    [name, email, status || 'active', id]
   )
 
   // Update password if provided using better-auth's internal context
@@ -62,11 +90,10 @@ app.patch('/api/users/:id', async (c) => {
 
 app.post('/api/users', async (c) => {
   const body = await c.req.json()
-  const { name, email, password } = body
+  const { name, email, password, status } = body
   const ctx = await auth.api.signUpEmail({
-    body: { name, email, password },
+    body: { name, email, password, status } as any,
   })
-  return c.json(ctx.user)
   return c.json(ctx.user)
 })
 

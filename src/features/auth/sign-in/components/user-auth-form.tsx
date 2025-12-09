@@ -62,7 +62,11 @@ export function UserAuthForm({
 
     if (error) {
       setIsLoading(false)
-      toast.error(error.message || 'Failed to sign in')
+      if (error.message?.toLowerCase().includes('inactive')) {
+        toast.error('Your account is inactive. Please contact the administrator.')
+      } else {
+        toast.error(error.message || 'Failed to sign in')
+      }
       return
     }
 
