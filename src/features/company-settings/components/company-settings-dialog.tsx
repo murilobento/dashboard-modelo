@@ -115,7 +115,9 @@ export function CompanySettingsDialog({
   useEffect(() => {
     if (open) {
       // Fetch initial data
-      fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/company-settings`)
+      fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/company-settings`
+      )
         .then((res) => res.json())
         .then((data) => {
           if (data && data.cnpj) {
@@ -131,11 +133,14 @@ export function CompanySettingsDialog({
   const onSubmit = async (data: CompanySettingsFormValues) => {
     setIsLoading(true)
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/company-settings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/company-settings`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        }
+      )
       if (res.ok) {
         toast.success('Configurações atualizadas com sucesso')
         // Clear URL params and reload to update logo

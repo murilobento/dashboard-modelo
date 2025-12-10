@@ -33,10 +33,7 @@ import { useUsers } from './users-provider'
 const formSchema = z
   .object({
     name: z.string().min(1, 'Nome é obrigatório.'),
-    email: z
-      .string()
-      .min(1, 'Email é obrigatório')
-      .email('Email inválido'),
+    email: z.string().min(1, 'Email é obrigatório').email('Email inválido'),
     status: z.string().min(1, 'Status é obrigatório'),
     password: z.string().transform((pwd) => pwd.trim()),
     confirmPassword: z.string().transform((pwd) => pwd.trim()),
@@ -88,21 +85,21 @@ export function UsersActionDialog({
     resolver: zodResolver(formSchema),
     defaultValues: isEdit
       ? {
-        name: currentRow.name,
-        email: currentRow.email,
-        status: currentRow.status || 'active',
-        password: '',
-        confirmPassword: '',
-        isEdit,
-      }
+          name: currentRow.name,
+          email: currentRow.email,
+          status: currentRow.status || 'active',
+          password: '',
+          confirmPassword: '',
+          isEdit,
+        }
       : {
-        name: '',
-        email: '',
-        status: 'active',
-        password: '',
-        confirmPassword: '',
-        isEdit,
-      },
+          name: '',
+          email: '',
+          status: 'active',
+          password: '',
+          confirmPassword: '',
+          isEdit,
+        },
   })
 
   const onSubmit = async (values: UserForm) => {

@@ -15,7 +15,9 @@ export function AppTitle() {
   } | null>(null)
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/company-settings`)
+    fetch(
+      `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/company-settings`
+    )
       .then((res) => res.json())
       .then((data) => setCompany(data))
       .catch(() => {
