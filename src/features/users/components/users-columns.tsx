@@ -103,6 +103,20 @@ export const usersColumns: ColumnDef<User>[] = [
     },
   },
   {
+    accessorKey: 'updatedAt',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Atualizado em' />
+    ),
+    cell: ({ row }) => {
+      const date = row.getValue('updatedAt') as Date
+      return (
+        <div className='text-nowrap'>
+          {format(date, 'PPP', { locale: ptBR })}
+        </div>
+      )
+    },
+  },
+  {
     id: 'actions',
     cell: DataTableRowActions,
   },
