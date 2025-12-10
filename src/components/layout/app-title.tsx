@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/sidebar'
 
 export function AppTitle() {
-  const { setOpenMobile } = useSidebar()
+  const { setOpenMobile, state } = useSidebar()
   const [company, setCompany] = useState<{
     nome_fantasia?: string
     email?: string
@@ -21,12 +21,27 @@ export function AppTitle() {
       .catch(console.error)
   }, [])
 
+  // Extract initials from company name
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((word) => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  const companyName = company?.nome_fantasia || 'Shadcn-Admin'
+  const companyEmail = company?.email || 'Vite + ShadcnUI'
+  const initials = getInitials(companyName)
+  const isCollapsed = state === 'collapsed'
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
         <SidebarMenuButton
           size='lg'
-          className='gap-0 py-0 hover:bg-transparent active:bg-transparent'
+          className='gap-0 py-0 hover:bg-transparent active:bg-transparent group-data-[collapsible=icon]:!p-0'
           asChild
         >
           <Link
@@ -34,12 +49,14 @@ export function AppTitle() {
             onClick={() => setOpenMobile(false)}
             className='grid flex-1 place-items-center text-center text-sm leading-tight'
           >
-            <span className='truncate font-bold'>
-              {company?.nome_fantasia || 'Shadcn-Admin'}
-            </span>
-            <span className='truncate text-xs'>
-              {company?.email || 'Vite + ShadcnUI'}
-            </span>
+            {isCollapsed ? (
+              <span className='text-xl font-bold tracking-tight'>{initials}</span>
+            ) : (
+              <>
+                <span className='truncate font-bold'>{companyName}</span>
+                <span className='truncate text-xs'>{companyEmail}</span>
+              </>
+            )}
           </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>

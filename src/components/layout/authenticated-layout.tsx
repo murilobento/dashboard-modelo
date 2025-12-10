@@ -43,11 +43,9 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
           <CompanySettingsDialog
             open={modal === 'company-settings'}
             onOpenChange={(open) => {
-              // @ts-ignore
-              if (!open)
-                navigate({
-                  search: (prev: any) => ({ ...prev, modal: undefined }),
-                })
+              if (!open) {
+                navigate({ to: '.', search: {} })
+              }
             }}
           />
         </SidebarProvider>
