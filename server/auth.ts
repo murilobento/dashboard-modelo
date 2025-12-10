@@ -26,5 +26,5 @@ export const auth = betterAuth({
       maxAge: 5 * 60, // 5 minutes
     },
   },
-  trustedOrigins: ['http://localhost:5173'],
+  trustedOrigins: process.env.TRUSTED_ORIGINS?.split(',').map(o => o.trim()) || ['http://localhost:5173'],
 })

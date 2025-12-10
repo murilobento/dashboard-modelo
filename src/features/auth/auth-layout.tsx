@@ -9,7 +9,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
   const [companyName, setCompanyName] = useState('Shadcn Admin')
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/company-settings')
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/company-settings`)
       .then((res) => res.json())
       .then((data) => {
         if (data && data.nome_fantasia) {

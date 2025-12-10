@@ -21,10 +21,10 @@ import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 
 const formSchema = z.object({
-  email: z.email({
-    error: (iss) =>
-      iss.input === '' ? 'Por favor insira seu email' : undefined,
-  }),
+  email: z
+    .string()
+    .min(1, 'Por favor insira seu email')
+    .email('Email inválido'),
   password: z
     .string()
     .min(1, 'Por favor insira sua senha')

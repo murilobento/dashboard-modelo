@@ -11,10 +11,18 @@ const pool = new Pool({
 
 const app = new Hono()
 
+// Parse allowed origins from environment variable
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',').map(o => o.trim()) || ['http://localhost:5173']
+
 app.use(
   '/api/*',
   cors({
-    origin: 'http://localhost:5173',
+    origin: (origin) => {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) return origin
+      // Check if origin is in allowed list
+      return allowedOrigins.includes(origin) ? origin : null
+    },
     credentials: true,
   })
 )
@@ -224,4 +232,5 @@ console.log(`Server running on http://localhost:${port}`)
 serve({
   fetch: app.fetch,
   port,
+  hostname: '0.0.0.0',
 })

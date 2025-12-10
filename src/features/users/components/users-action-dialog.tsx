@@ -33,7 +33,10 @@ import { useUsers } from './users-provider'
 const formSchema = z
   .object({
     name: z.string().min(1, 'Nome é obrigatório.'),
-    email: z.email({ message: 'Email é obrigatório.' }),
+    email: z
+      .string()
+      .min(1, 'Email é obrigatório')
+      .email('Email inválido'),
     status: z.string().min(1, 'Status é obrigatório'),
     password: z.string().transform((pwd) => pwd.trim()),
     confirmPassword: z.string().transform((pwd) => pwd.trim()),
@@ -85,21 +88,21 @@ export function UsersActionDialog({
     resolver: zodResolver(formSchema),
     defaultValues: isEdit
       ? {
-          name: currentRow.name,
-          email: currentRow.email,
-          status: currentRow.status || 'active',
-          password: '',
-          confirmPassword: '',
-          isEdit,
-        }
+        name: currentRow.name,
+        email: currentRow.email,
+        status: currentRow.status || 'active',
+        password: '',
+        confirmPassword: '',
+        isEdit,
+      }
       : {
-          name: '',
-          email: '',
-          status: 'active',
-          password: '',
-          confirmPassword: '',
-          isEdit,
-        },
+        name: '',
+        email: '',
+        status: 'active',
+        password: '',
+        confirmPassword: '',
+        isEdit,
+      },
   })
 
   const onSubmit = async (values: UserForm) => {
@@ -176,7 +179,7 @@ export function UsersActionDialog({
                   <FormLabel className='col-span-2 text-end'>Nome</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder='John Doe'
+                      placeholder='João Silva'
                       className='col-span-4'
                       autoComplete='off'
                       {...field}
@@ -195,7 +198,7 @@ export function UsersActionDialog({
                   <FormLabel className='col-span-2 text-end'>Email</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder='john@example.com'
+                      placeholder='joao@exemplo.com'
                       className='col-span-4'
                       {...field}
                       disabled={readOnly || isLoading}

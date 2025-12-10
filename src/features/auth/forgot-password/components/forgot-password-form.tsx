@@ -18,10 +18,10 @@ import {
 import { Input } from '@/components/ui/input'
 
 const formSchema = z.object({
-  email: z.email({
-    error: (iss) =>
-      iss.input === '' ? 'Por favor, insira seu email' : undefined,
-  }),
+  email: z
+    .string()
+    .min(1, 'Por favor, insira seu email')
+    .email('Email inválido'),
 })
 
 export function ForgotPasswordForm({
@@ -67,7 +67,7 @@ export function ForgotPasswordForm({
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input placeholder='name@example.com' {...field} />
+                <Input placeholder='nome@exemplo.com' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
